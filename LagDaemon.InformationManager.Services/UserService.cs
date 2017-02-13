@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LagDaemon.InformationManager.DAL.Model;
 using AutoMapper;
 using LagDaemon.InformationManager.DAL.Transactions;
+using LagDaemon.InformationManager.Interfaces;
 
 namespace LagDaemon.InformationManager.Services
 {
@@ -22,27 +23,49 @@ namespace LagDaemon.InformationManager.Services
             }
         }
 
-        public UserDto ChangePassword(UserDto user, string oldPassword, string newPassword)
+        public ActionResult<UserDto> ChangePassword(UserDto user, string oldPassword, string newPassword)
         {
             var u = uow.UserRepository.ChangePassword(user.Login, oldPassword, newPassword);
             uow.Save();
-            if (u != null) return Mapper.Map<UserDto>( u );
-            return null;
+            if (u.ResultType == ResultType.Success)
+            {
+                uow.Save();
+                return new ActionResult<UserDto>(Mapper.Map<UserDto>(u.Result), ResultType.Success);
+            }
+            return new ActionResult<UserDto>(user, ResultType.Failure, u.ErrorMessage);
         }
 
-        public UserDto CheckCredentials(string login, string password)
+        public ActionResult<UserDto> AddUserToGroup(UserDto user, GroupDto group)
+        {
+            var u = uow.UserRepository.AddUserToGroup(user.UserId, group.GroupId);
+            if (u.ResultType == ResultType.Success)
+            {
+                uow.Save();
+                return new ActionResult<UserDto>(Mapper.Map<UserDto>(u.Result), ResultType.Success);
+            }
+            return new ActionResult<UserDto>(user, ResultType.Failure, u.ErrorMessage);
+        }
+
+        public ActionResult<UserDto> CheckCredentials(string login, string password)
         {
             var u = uow.UserRepository.CheckCredentials(login, password);
-            if (u != null) return Mapper.Map<UserDto>(u);
-            return null;
+            if (u.ResultType == ResultType.Success)
+            {
+                uow.Save();
+                return new ActionResult<UserDto>(Mapper.Map<UserDto>(u.Result), ResultType.Success);
+            }
+            return new ActionResult<UserDto>(null, ResultType.Failure, u.ErrorMessage);
         }
 
-        public UserDto CreateUser(string login, string email, string password)
+        public ActionResult<UserDto> CreateUser(string login, string email, string password)
         {
             var u = uow.UserRepository.CreateUser(login, email, password);
-            uow.Save();
-            if (u != null) return Mapper.Map<UserDto>(u);
-            return null;
+            if (u.ResultType == ResultType.Success)
+            {
+                uow.Save();
+                return new ActionResult<UserDto>(Mapper.Map<UserDto>(u.Result), ResultType.Success);
+            }
+            return new ActionResult<UserDto>(null, ResultType.Failure, u.ErrorMessage);
         }
 
         public void DeleteUser(UserDto user)

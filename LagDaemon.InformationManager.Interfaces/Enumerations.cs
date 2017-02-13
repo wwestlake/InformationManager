@@ -15,4 +15,11 @@ namespace LagDaemon.InformationManager.Interfaces
         Finalizing,
         Shutodwn
     }
+
+    public enum ResultType
+    {
+        Success,
+        Failure
+    }
+
 }

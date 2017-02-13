@@ -23,6 +23,8 @@ namespace LagDaemon.InformationManager.DAL.Repos
             this.dbSet = context.Set<TEntity>();
         }
 
+        public DbSet<TEntity> DbSet { get { return dbSet; } }
+
         public virtual TEntity GetFirst(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

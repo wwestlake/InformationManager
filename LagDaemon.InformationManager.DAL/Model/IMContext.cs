@@ -27,6 +27,10 @@ namespace LagDaemon.InformationManager.DAL.Model
             modelBuilder.Configurations.Add(new StringValueMap());
             modelBuilder.Configurations.Add(new DateTimeValueMap());
 
+            modelBuilder.Configurations.Add(new DocumentMap());
+            modelBuilder.Configurations.Add(new AuthorMap());
+            modelBuilder.Configurations.Add(new DocumentSectionMap());
+            modelBuilder.Configurations.Add(new TextBlockMap());
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -84,16 +84,29 @@
     <Compile Include="Migrations\201702121741111_added mappings.Designer.cs">
       <DependentUpon>201702121741111_added mappings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201702130054515_added document entities.cs" />
+    <Compile Include="Migrations\201702130054515_added document entities.Designer.cs">
+      <DependentUpon>201702130054515_added document entities.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Model\Author.cs" />
+    <Compile Include="Model\Document.cs" />
+    <Compile Include="Model\DocumentSection.cs" />
+    <Compile Include="Model\EntityMaps\AuthorMap.cs" />
+    <Compile Include="Model\EntityMaps\DocumentMap.cs" />
+    <Compile Include="Model\EntityMaps\DocumentSectionMap.cs" />
     <Compile Include="Model\EntityMaps\GroupMap.cs" />
     <Compile Include="Model\EntityMaps\MetaValueMap.cs" />
+    <Compile Include="Model\EntityMaps\TextBlockMap.cs" />
     <Compile Include="Model\EntityMaps\UserMap.cs" />
     <Compile Include="Model\Group.cs" />
     <Compile Include="Model\IMContext.cs" />
     <Compile Include="Model\MetaData.cs" />
     <Compile Include="Model\MetaValue.cs" />
+    <Compile Include="Model\TextBlock.cs" />
     <Compile Include="Model\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repos\DocumentRepository.cs" />
     <Compile Include="Repos\GenericRepository.cs" />
     <Compile Include="Repos\GroupRepository.cs" />
     <Compile Include="Repos\UserRepository.cs" />
@@ -124,6 +137,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201702121741111_added mappings.resx">
       <DependentUpon>201702121741111_added mappings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702130054515_added document entities.resx">
+      <DependentUpon>201702130054515_added document entities.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

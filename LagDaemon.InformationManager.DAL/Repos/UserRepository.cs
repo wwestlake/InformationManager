@@ -1,5 +1,6 @@
 ﻿using LagDaemon.InformationManager.DAL.Interfaces;
 using LagDaemon.InformationManager.DAL.Model;
+using LagDaemon.InformationManager.Interfaces;
 using Sodium;
 using System;
 using System.Collections.Generic;
@@ -13,23 +14,23 @@ namespace LagDaemon.InformationManager.DAL.Repos
     {
         public UserRepository(IMContext context, ReportException exHandler) : base(context, exHandler) { }
 
-        public void AddUserToGroup(User user, Group group)
+        protected void AddUserToGroup(User user, Group group)
         {
             try
             {
                 if (!IsUserInGroup(user, group))
                 {
                     user.Groups.Add(group);
-                    group.Users.Add(user);
+                    Update(user);
                 }
             }
             catch (Exception ex)
             {
-                exHandler("UserRepository", "AddUserToGroup", ex);
+                exHandler(this, new ExceptionEventArgs("UserRepository:AddUserToGroup", ex));
             }
         }
 
-        public void AddUserToGroup(int userid, int groupid)
+        public ActionResult<User> AddUserToGroup(int userid, int groupid)
         {
             try
             {
@@ -37,10 +38,12 @@ namespace LagDaemon.InformationManager.DAL.Repos
                 var user = GetByID(userid);
                 var group = groupRepo.GetByID(groupid);
                 AddUserToGroup(user, group);
+                return new ActionResult<User>(user, ResultType.Success);
             }
             catch (Exception ex)
             {
-                exHandler("UserRepository", "AddUserToGroup", ex);
+                exHandler(this, new ExceptionEventArgs("UserRepository:AddUserToGroup", ex));
+                return new ActionResult<User>(null, ResultType.Failure, ex.ToString());
             }
         }
 
@@ -51,8 +54,14 @@ namespace LagDaemon.InformationManager.DAL.Repos
             return false; 
         }
 
-        public User CreateUser(string login, string email, string password)
+        public ActionResult<User> CreateUser(string login, string email, string password)
         {
+            var checkUser = Get(u => u.Login == login || u.Email == email);
+            if (checkUser != null)
+            {
+                return new ActionResult<User>(null, ResultType.Failure, "User already exists");
+            }
+
             var user = new User
             {
                 Login = login,
@@ -64,21 +73,19 @@ namespace LagDaemon.InformationManager.DAL.Repos
                 Validated = false
             };
             Insert(user);
-            return user;
+            return new ActionResult<User>(user, ResultType.Success);
         }
 
-        public User ChangePassword(string loginOrEmail, string oldPassword, string newPassword)
+        public ActionResult<User> ChangePassword(string loginOrEmail, string oldPassword, string newPassword)
         {
             var u = CheckCredentials(loginOrEmail, oldPassword);
-            if (u != null)
-            {
-                u.Password = HashPassword(newPassword);
-                return u;
-            }
-            return null;
+            if (u.ResultType == ResultType.Failure) return u;
+            u.Result.Password = HashPassword(newPassword);
+            Update(u.Result);
+            return u;
         }
 
-        public User CheckCredentials(string loginOrEmail, string password)
+        public ActionResult<User> CheckCredentials(string loginOrEmail, string password)
         {
             User user;
             if (loginOrEmail.Contains('@'))
@@ -88,12 +95,12 @@ namespace LagDaemon.InformationManager.DAL.Repos
             {
                 user = Get(u => u.Login.Equals(loginOrEmail)).FirstOrDefault();
             }
-            if (user == null) return null;
+            if (user == null) return new ActionResult<User>(null, ResultType.Failure, "Invalid Credentials");
             if (VerifyPassword(user.Password, password))
             {
-                return user;
+                return new ActionResult<User>(user, ResultType.Success);
             }
-            return null;
+            return new ActionResult<User>(null, ResultType.Failure, "Invalid Credentials");
         }
 
         private string HashPassword(string clearPassword)

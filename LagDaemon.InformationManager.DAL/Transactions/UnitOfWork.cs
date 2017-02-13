@@ -1,6 +1,7 @@
 ﻿using LagDaemon.InformationManager.DAL.Interfaces;
 using LagDaemon.InformationManager.DAL.Model;
 using LagDaemon.InformationManager.DAL.Repos;
+using LagDaemon.InformationManager.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,11 +74,11 @@ namespace LagDaemon.InformationManager.DAL.Transactions
             GC.SuppressFinalize(this);
         }
 
-        private void FireExceptionEvent(string className, string method, Exception ex)
+        private void FireExceptionEvent(object sender, ExceptionEventArgs args)
         {
             if (ExceptionEvent != null)
             {
-                ExceptionEvent.Invoke(className, method, ex);
+                ExceptionEvent.Invoke(sender, args);
             }
         }
 

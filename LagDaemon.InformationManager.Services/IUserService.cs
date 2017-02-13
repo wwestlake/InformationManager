@@ -12,9 +12,10 @@ namespace LagDaemon.InformationManager.Services
     {
         IEnumerable<UserDto> AllUsers { get; }
         void DeleteUser(UserDto user);
-        UserDto CreateUser(string login, string email, string password);
+        ActionResult<UserDto> CreateUser(string login, string email, string password);
         void UpdateUser(UserDto user);
-        UserDto CheckCredentials(string login, string password);
-        UserDto ChangePassword(UserDto user, string oldPassword, string newPassword);
+        ActionResult<UserDto> CheckCredentials(string login, string password);
+        ActionResult<UserDto> AddUserToGroup(UserDto user, GroupDto group);
+        ActionResult<UserDto> ChangePassword(UserDto user, string oldPassword, string newPassword);
     }
 }
