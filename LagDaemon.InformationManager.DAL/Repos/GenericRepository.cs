@@ -6,7 +6,6 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq.Expressions;
 using LagDaemon.InformationManager.DAL.Model;
-using LagDaemon.InformationManager.DAL.Interfaces;
 
 namespace LagDaemon.InformationManager.DAL.Repos
 { 
@@ -14,12 +13,10 @@ namespace LagDaemon.InformationManager.DAL.Repos
     {
         internal IMContext context;
         internal DbSet<TEntity> dbSet;
-        internal ReportException exHandler;
 
-        public GenericRepository(IMContext context, ReportException exHandler)
+        public GenericRepository(IMContext context)
         {
             this.context = context;
-            this.exHandler = exHandler;
             this.dbSet = context.Set<TEntity>();
         }
 

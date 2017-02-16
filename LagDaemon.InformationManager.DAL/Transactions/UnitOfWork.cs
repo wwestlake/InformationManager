@@ -1,26 +1,24 @@
-﻿using LagDaemon.InformationManager.DAL.Interfaces;
-using LagDaemon.InformationManager.DAL.Model;
+﻿using LagDaemon.InformationManager.DAL.Model;
 using LagDaemon.InformationManager.DAL.Repos;
-using LagDaemon.InformationManager.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LagDaemon.InformationManager.DAL.Transactions
 {
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork
     {
-        public event ReportException ExceptionEvent;
 
-        private IMContext context = new IMContext();
+        private IMContext context;
         private UserRepository userRepository;
         private GroupRepository groupRepository;
 
+        public UnitOfWork()
+        {
+            context = ContextFactory.Context;
+        }
+
         public GenericRepository<TEntity> Repository<TEntity>() where TEntity: class
         {
-            return new GenericRepository<TEntity>(context, FireExceptionEvent);
+            return new GenericRepository<TEntity>(context);
         }
 
         public UserRepository UserRepository
@@ -29,7 +27,7 @@ namespace LagDaemon.InformationManager.DAL.Transactions
             {
                 if (this.userRepository == null)
                 {
-                    this.userRepository = new UserRepository(context, FireExceptionEvent);
+                    this.userRepository = new UserRepository(context);
                 }
                 return userRepository;
             }
@@ -41,7 +39,7 @@ namespace LagDaemon.InformationManager.DAL.Transactions
             {
                 if (this.groupRepository == null)
                 {
-                    this.groupRepository = new GroupRepository(context, FireExceptionEvent);
+                    this.groupRepository = new GroupRepository(context);
                 }
                 return groupRepository;
             }
@@ -54,33 +52,9 @@ namespace LagDaemon.InformationManager.DAL.Transactions
             context.SaveChanges();
         }
 
-        private bool disposed = false;
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    context.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void FireExceptionEvent(object sender, ExceptionEventArgs args)
-        {
-            if (ExceptionEvent != null)
-            {
-                ExceptionEvent.Invoke(sender, args);
-            }
-        }
+ 
 
     }
 }

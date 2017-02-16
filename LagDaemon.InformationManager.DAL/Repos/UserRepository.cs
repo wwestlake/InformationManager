@@ -1,50 +1,33 @@
-﻿using LagDaemon.InformationManager.DAL.Interfaces;
-using LagDaemon.InformationManager.DAL.Model;
+﻿using LagDaemon.InformationManager.DAL.Model;
 using LagDaemon.InformationManager.Interfaces;
 using Sodium;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LagDaemon.InformationManager.DAL.Repos
 {
     public class UserRepository : GenericRepository<User> 
     {
-        public UserRepository(IMContext context, ReportException exHandler) : base(context, exHandler) { }
+        public UserRepository(IMContext context) : base(context) { }
 
-        protected void AddUserToGroup(User user, Group group)
+        protected ActionResult<User> AddUserToGroup(User user, Group group)
         {
-            try
+            if (!IsUserInGroup(user, group))
             {
-                if (!IsUserInGroup(user, group))
-                {
-                    user.Groups.Add(group);
-                    Update(user);
-                }
+                user.Groups.Add(group);
+                Update(user);
+                return new ActionResult<User>(user, ResultType.Success);
             }
-            catch (Exception ex)
-            {
-                exHandler(this, new ExceptionEventArgs("UserRepository:AddUserToGroup", ex));
-            }
+            return new ActionResult<User>(user, ResultType.Failure, "User already in group");
         }
 
         public ActionResult<User> AddUserToGroup(int userid, int groupid)
         {
-            try
-            {
-                var groupRepo = new GroupRepository(context, exHandler);
-                var user = GetByID(userid);
-                var group = groupRepo.GetByID(groupid);
-                AddUserToGroup(user, group);
-                return new ActionResult<User>(user, ResultType.Success);
-            }
-            catch (Exception ex)
-            {
-                exHandler(this, new ExceptionEventArgs("UserRepository:AddUserToGroup", ex));
-                return new ActionResult<User>(null, ResultType.Failure, ex.ToString());
-            }
+            var groupRepo = new GroupRepository(context);
+            var user = GetByID(userid);
+            var group = groupRepo.GetByID(groupid);
+            AddUserToGroup(user, group);
+            return new ActionResult<User>(user, ResultType.Success);
         }
 
         public bool IsUserInGroup(User user, Group group)

@@ -1,17 +1,11 @@
-﻿using LagDaemon.InformationManager.DAL.Interfaces;
-using LagDaemon.InformationManager.DAL.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LagDaemon.InformationManager.DAL.Model;
 
 namespace LagDaemon.InformationManager.DAL.Repos
 {
     public class GroupRepository : GenericRepository<Group>
     {
-        public GroupRepository(IMContext context, ReportException exHandler) 
-            : base(context, exHandler) { }
+        public GroupRepository(IMContext context) 
+            : base(context) { }
 
         public Group CreateGroup(string name, string description)
         {
